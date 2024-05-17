@@ -1,6 +1,4 @@
 import unittest
-from pythonds.basic.stack import Stack
-from pythonds.trees.binaryTree import BinaryTree
 from BooleanExpression import BooleanExpression
 
 
@@ -24,17 +22,17 @@ class TestBooleanExpression(unittest.TestCase):
 
     def test_build_SDNF(self):
         expression = BooleanExpression('((a&b)|(!c))')
-        self.assertEqual(expression.build_SDNF(), '((!a)∧(!b)∧(!c))v((!a)∧b∧(!c))v(a∧(!b)∧(!c))v(a∧b∧(!c))v(a∧b∧c)')
+        self.assertEqual(expression.build_SDNF(), '((!a)&(!b)&(!c))|((!a)&b&(!c))|(a&(!b)&(!c))|(a&b&(!c))|(a&b&c)')
 
     def test_build_SKNF(self):
         expression = BooleanExpression('((a&b)|(!c))')
-        self.assertEqual(expression.build_SKNF(), '(avbv(!c))∧(av(!b)v(!c))∧((!a)vbv(!c))')
+        self.assertEqual(expression.build_SKNF(), '(a|b|(!c))&(a|(!b)|(!c))&((!a)|b|(!c))')
 
     def test_print_numeric_forms(self):
         expression = BooleanExpression('((a&b)|(!c))')
         SDNF, SKNF = expression.build_numeric_forms()
-        self.assertEqual(SDNF, '(0 2 4 6 7 ) v')
-        self.assertEqual(SKNF, '(1 3 5 ) ∧')
+        self.assertEqual(SDNF, '(0 2 4 6 7 ) |')
+        self.assertEqual(SKNF, '(1 3 5 ) &')
 
     def test_print_index_form(self):
         expression = BooleanExpression('((a&b)|(!c))')
