@@ -259,4 +259,4 @@ class Karnaugh5(KarnaughTemplate):
 #
 # karnaugh_method_SKNF = Karnaugh5(expression, 'SKNF')
 # karnaugh_method_SKNF.print_table()
-# print(karnaugh_method_SDNF.merged_form())
+# print(karnaugh_method_SKNF.merged_form())
