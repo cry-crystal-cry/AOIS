@@ -6,10 +6,10 @@ class BooleanExpression:
 
     def __init__(self, exp):
         self.__exp = exp
-        self.__index_by_variable_dict, self.__variable_by_index_dict = self.__create_variable_dict()
+        self.__index_by_variable_dict, self.__variable_by_index_dict = self.create_variable_dict()
         self.__syntax_tree = self.create_syntax_tree(exp)
 
-    def __create_variable_dict(self):
+    def create_variable_dict(self):
         list_of_variables = []
         for i in self.__exp:
             if 'a' <= i <= 'z' and i not in list_of_variables:
@@ -252,12 +252,12 @@ def to_decimal_form(binary_list):
 
 # Debug or hand based input
 #
-exp = BooleanExpression('((!(a&(!b)))>c)')
-for i in exp.truth_table():
-    print(i)
-print('SDNF\n' + exp.build_SDNF())
-print('SKNF\n' + exp.build_SKNF())
-print('Numeric_form')
-SDNF_num, SKNF_num = exp.build_numeric_forms()
-print(SDNF_num + '\n' + SKNF_num)
-print('Index_form\n' + exp.build_index_form())
+# exp = BooleanExpression('((g~a)>(c&d))')
+# for i in exp.truth_table():
+#     print(i)
+# print('SDNF\n' + exp.build_SDNF())
+# print('SKNF\n' + exp.build_SKNF())
+# print('Numeric_form')
+# SDNF_num, SKNF_num = exp.build_numeric_forms()
+# print(SDNF_num, '\n', SKNF_num)
+# print('Index_form\n', exp.build_index_form())

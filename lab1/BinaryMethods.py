@@ -45,7 +45,6 @@ class BinaryMethods:
 
     @staticmethod
     def from_binary_to_decimal(bin_str: str) -> int:
-        # перевод из двоичного представления в двоичное представление
         n = len(bin_str)
         s = 0
         for i in range(n):
@@ -53,6 +52,15 @@ class BinaryMethods:
                 s += 2 ** (n - i - 1)
         if bin_str[0] == '1':
             s -= 2 ** n
+        return s
+
+    @staticmethod
+    def from_positive_binary_to_decimal(bin_str: str) -> int:
+        n = len(bin_str)
+        s = 0
+        for i in range(n):
+            if bin_str[i] == '1':
+                s += 2 ** (n - i - 1)
         return s
 
     @classmethod
@@ -112,19 +120,30 @@ class BinaryMethods:
         # Проверка на равенство a и b
         if a == b:
             return cls.num_31 * '0' + '1'
-        remainder = ''
-        divide_bin_result = ''
+
+        def is_less(bin1: str, bin2: str) -> bool:
+            bin1 = bin1.lstrip('0')
+            bin2 = bin2.lstrip('0')
+            if len(bin1) != len(bin2):
+                return len(bin1) < len(bin2)
+            return bin1 < bin2
+
+        remainder, divide_bin_result = '', ''
         a += '00000'
+
         for i in range(len(a)):
             current = remainder + a[i]
             # Если текущее значение меньше b, добавляем следующий бит и переходим к следующей цифре
-            if int(current) < int(b):
+            if is_less(current, b):
                 remainder = current
                 divide_bin_result += '0'
                 continue
             # Иначе, вычитаем b из текущего значения и добавляем единицу к результату
-            remainder = str(int(BinaryMethods.add_binary(list(current.zfill(32)),
-                                                         list(BinaryMethods.get_negative_binary(b.zfill(32))))))
+            remainder = BinaryMethods.add_binary(
+                list(current.zfill(32)),
+                list(BinaryMethods.get_negative_binary(b.zfill(32)))
+            )
+            remainder = ''.join(remainder).lstrip('0')  # Убираем ведущие нули
             divide_bin_result += '1'
 
         float_path = divide_bin_result[-5:]
@@ -332,4 +351,5 @@ class BinaryMethods:
         return BinaryMethods.from_float_to_decimal(result)
 
 
-print(BinaryMethods.divide_dec(15, 9))
+print('15\\11')
+print(BinaryMethods.divide_dec(15, 11))
