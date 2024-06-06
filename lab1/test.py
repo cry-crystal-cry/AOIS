@@ -16,28 +16,28 @@ class TestBinaryMethods(unittest.TestCase):
                          '11111111111111111111111110000001')
 
     def test_from_decimal_to_binary(self):
-        self.assertEqual(BinaryMethods.from_decimal_to_binary(10), '00000000000000000000000000001010')
-        self.assertEqual(BinaryMethods.from_decimal_to_binary(-10), '11111111111111111111111111110110')
-        self.assertEqual(BinaryMethods.from_decimal_to_binary(0), '00000000000000000000000000000000')
+        self.assertEqual(BinaryMethods.decimal_to_binary(10), '00000000000000000000000000001010')
+        self.assertEqual(BinaryMethods.decimal_to_binary(-10), '11111111111111111111111111110110')
+        self.assertEqual(BinaryMethods.decimal_to_binary(0), '00000000000000000000000000000000')
 
     def test_from_binary_to_decimal(self):
-        self.assertEqual(BinaryMethods.from_binary_to_decimal('00000000000000000000000000001010'), 10)
-        self.assertEqual(BinaryMethods.from_binary_to_decimal('11111111111111111111111111110110'), -10)
-        self.assertEqual(BinaryMethods.from_binary_to_decimal('00000000000000000000000000000000'), 0)
-        self.assertEqual(BinaryMethods.from_binary_to_decimal('01111111111111111111111111111111'), 2147483647)
-        self.assertEqual(BinaryMethods.from_binary_to_decimal('10000000000000000000000000000000'), -2147483648)
+        self.assertEqual(BinaryMethods.binary_to_decimal('00000000000000000000000000001010'), 10)
+        self.assertEqual(BinaryMethods.binary_to_decimal('11111111111111111111111111110110'), -10)
+        self.assertEqual(BinaryMethods.binary_to_decimal('00000000000000000000000000000000'), 0)
+        self.assertEqual(BinaryMethods.binary_to_decimal('01111111111111111111111111111111'), 2147483647)
+        self.assertEqual(BinaryMethods.binary_to_decimal('10000000000000000000000000000000'), -2147483648)
 
     def test_add_binary(self):
-        self.assertEqual(BinaryMethods.add_binary(list('00000000000000000000000000001010'),
+        self.assertEqual(BinaryMethods.binary_sum(list('00000000000000000000000000001010'),
                                                   list('00000000000000000000000000001010')),
                          '00000000000000000000000000010100')
-        self.assertEqual(BinaryMethods.add_binary(list('01111111111111111111111111111111'),
+        self.assertEqual(BinaryMethods.binary_sum(list('01111111111111111111111111111111'),
                                                   list('00000000000000000000000000000001')),
                          '10000000000000000000000000000000')
 
     def test_add_decimal(self):
-        self.assertEqual(BinaryMethods.add_decimal(10, 5), 15)
-        self.assertEqual(BinaryMethods.add_decimal(2147483647, 1), -2147483648)
+        self.assertEqual(BinaryMethods.decimal_sum(10, 5), 15)
+        self.assertEqual(BinaryMethods.decimal_sum(2147483647, 1), -2147483648)
 
     def test_positive_multiplication_of_numbers(self):
         self.assertEqual(BinaryMethods.positive_multiplication_of_numbers(10, 5), 50)
@@ -48,38 +48,42 @@ class TestBinaryMethods(unittest.TestCase):
         self.assertEqual(BinaryMethods.multiplication_of_numbers(10, -5), -50)
 
     def test_divide_dec(self):
-        self.assertEqual(BinaryMethods.divide_dec(10, 5), 2)
-        self.assertEqual(BinaryMethods.divide_dec(10, -5), -2)
-        self.assertEqual(BinaryMethods.divide_dec(-10, 5), -2)
-        self.assertEqual(BinaryMethods.divide_dec(-10, -5), 2)
+        self.assertEqual(BinaryMethods.divide_decimal(10, 5), 2)
+        self.assertEqual(BinaryMethods.divide_decimal(10, -5), -2)
+        self.assertEqual(BinaryMethods.divide_decimal(-10, 5), -2)
+        self.assertEqual(BinaryMethods.divide_decimal(-10, -5), 2)
 
     def test_from_fraction_to_bin(self):
-        self.assertEqual(BinaryMethods.from_fraction_to_bin('625'), '101')
-        self.assertEqual(BinaryMethods.from_fraction_to_bin('3125'), '0101')
+        self.assertEqual(BinaryMethods.fraction_to_binary('625'), '101')
+        self.assertEqual(BinaryMethods.fraction_to_binary('3125'), '0101')
 
     def test_find_shift_order(self):
         self.assertEqual(BinaryMethods.find_shift_order('10000000', '10101'), '00000000000000000000000010000110')
 
     def test_from_decimal_to_float(self):
-        self.assertEqual(BinaryMethods.from_decimal_to_float(1.25), '0 01111111 01000000000000000000000')
-        self.assertEqual(BinaryMethods.from_decimal_to_float(-1.25), '1 01111111 01000000000000000000000')
+        self.assertEqual(BinaryMethods.decimal_to_float(1.25), '0 01111111 01000000000000000000000')
+        self.assertEqual(BinaryMethods.decimal_to_float(-1.25), '1 01111111 01000000000000000000000')
 
     def test_from_binary_remainder_to_decimal(self):
-        self.assertAlmostEqual(BinaryMethods.from_binary_remainder_to_decimal('101'), 0.625)
+        self.assertAlmostEqual(BinaryMethods.binary_fractional_to_decimal('101'), 0.625)
 
     def test_from_float_to_decimal(self):
-        self.assertAlmostEqual(BinaryMethods.from_float_to_decimal('00111111101000000000000000000000'), 1.25)
-        self.assertAlmostEqual(BinaryMethods.from_float_to_decimal('10111111101000000000000000000000'), -1.25)
+        self.assertAlmostEqual(BinaryMethods.float_to_decimal('00111111101000000000000000000000'), 1.25)
+        self.assertAlmostEqual(BinaryMethods.float_to_decimal('10111111101000000000000000000000'), -1.25)
 
     def test_diff_between_shifts_and_mantissa_additions(self):
         mantissa1, mantissa2, exp_result = BinaryMethods.diff_between_shifts_and_mantissa_additions(
             '00111111101000000000000000000000', '10111111101000000000000000000000', -127, -127)
+        BinaryMethods.check_which_mantissa_is_less('00111111101000000000000000000000',
+                                                   '10111111101000000000000000000000')
         self.assertEqual((mantissa1, mantissa2, exp_result),
                          ('101000000000000000000000', '101000000000000000000000', -127))
 
     def test_mantissa_addition(self):
         mantissa_sum, exp_result = BinaryMethods.mantissa_addition('0', '1', '01000000000000000000000',
                                                                    '01000000000000000000000', -127)
+        BinaryMethods.check_which_exponent_is_less('00111111101000000000000000000000',
+                                                   '10111111101000000000000000000000')
         self.assertEqual((mantissa_sum, exp_result), ('00000000000000000000000000000000', 0))
 
     def test_define_sign(self):
