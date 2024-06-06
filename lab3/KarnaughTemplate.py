@@ -15,7 +15,10 @@ class KarnaughTemplate:
     def form_final_normal_form_fields(self) -> list[list[tuple]]:
         used_indexes: list[tuple] = []
         fields: list[list[tuple]] = []
-        value = 1 if self.form_to_minimize == 'SDNF' else 0
+        if self.form_to_minimize == 'SDNF':
+            value = 1
+        else:
+            value = 0
         for i in range(len(self.map)):
             for j in range(len(self.map[0])):
                 if not (i, j) in used_indexes and self.map[i][j] == value:
@@ -94,6 +97,8 @@ class KarnaughTemplate:
                 break
             cells_in_one_row.append(field[i])
         next_row_to_check = len(self.map) - 1 if cells_in_one_row[0][0] == 0 else cells_in_one_row[0][0] - 1
+        self.calculate_field_perimeter(field)
+        self.expand_field(field, 1)
         go_status = True
         possible_to_go_cells = []
         while go_status:
@@ -137,8 +142,15 @@ class KarnaughTemplate:
         if len(variables) == 1 and len(variables[0]) == 0:
             return 'merged form is empty'
         merged_form = ''
-        inside_separator = '&' if self.form_to_minimize == 'SDNF' else '|'
-        separator = '|' if self.form_to_minimize == 'SDNF' else '&'
+        if self.form_to_minimize == 'SDNF':
+            separator = '|'
+        else:
+            separator = '&'
+        if self.form_to_minimize == 'SDNF':
+            inside_separator = '&'
+        else:
+            inside_separator = '|'
+
         for i in range(len(variables)):
             # for list with single variable (no extra brackets)
             if len(variables[i]) == 1 and (len(variables[i][0]) == 4 or len(variables[i][0]) == 1):
@@ -163,6 +175,26 @@ class KarnaughTemplate:
             index_list.pop()
         return index_list
 
+    def debug_map(self):
+        for row in self.map:
+            print(' '.join(map(str, row)))
+        print()
+
+    def find_not_used_indexes(self):
+        not_used_indexes = {index for field in self.form_final_normal_form_fields() for index in field}
+        unused_indexes = [(i, j) for i in range(len(self.map)) for j in range(len(self.map[0])) if
+                          (i, j) not in not_used_indexes]
+        return unused_indexes
+
+    @staticmethod
+    def get_positive_binary(decimal_number: int) -> str:
+        binary_number = ""
+        while decimal_number > 0:
+            remainder = decimal_number % 2
+            binary_number = str(remainder) + binary_number
+            decimal_number = decimal_number // 2
+        return binary_number
+
     @staticmethod
     def to_decimal_form(binary: str) -> int:
         binary.lstrip('0')
@@ -172,3 +204,4 @@ class KarnaughTemplate:
         for i in range(len(binary) - 1, -1, -1):
             decimal += int(binary[i]) * pow(2, len(binary) - 1 - i)
         return decimal
+

@@ -4,11 +4,16 @@
     <list default="true" id="6a67d8e2-1b39-4ce4-a8da-550e579e4f8e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BinaryMethods.py" beforeDir="false" afterPath="$PROJECT_DIR$/BinaryMethods.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab2/BooleanExpression.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab2/BooleanExpression.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab3/CalculationMethod.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/CalculationMethod.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab3/CalculationMethodTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/CalculationMethodTest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab3/CalculationTableMethod.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/CalculationTableMethod.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab3/Karnaugh2.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/Karnaugh2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab3/Karnaugh3.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/Karnaugh3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab3/Karnaugh4.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/Karnaugh4.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab3/Karnaugh5.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/Karnaugh5.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab3/KarnaughTemplate.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/KarnaughTemplate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab3/KarnaughTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab3/KarnaughTest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab6/HashTable.py" beforeDir="false" afterPath="$PROJECT_DIR$/../lab6/HashTable.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -166,6 +171,8 @@
       <workItem from="1716026188196" duration="3173000" />
       <workItem from="1717234711486" duration="39000" />
       <workItem from="1717686666282" duration="7125000" />
+      <workItem from="1717693892498" duration="6000" />
+      <workItem from="1717701143977" duration="1601000" />
     </task>
     <servers />
   </component>
@@ -173,7 +180,7 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/lab1$.coverage" NAME=" Coverage Results" MODIFIED="1717693791200" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/lab1$.coverage" NAME=" Coverage Results" MODIFIED="1717702427067" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lab1$BinaryMethods.coverage" NAME="BinaryMethods Coverage Results" MODIFIED="1717690619553" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/lab1$main.coverage" NAME="main Coverage Results" MODIFIED="1714816268899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

@@ -35,6 +35,13 @@ class Karnaugh5(KarnaughTemplate):
                 counter += 1
         return table
 
+    def check_field_validity(self, field: list[tuple]) -> bool:
+        # check if all cells has same value
+        if not field:
+            return False
+        first_value = self.map[field[0][0]][field[0][1]]
+        return all(self.map[i][j] == first_value for i, j in field)
+
     def build_sides(self) -> (list[list[int]], list[list[int]]):
         right_half: list[list[int]] = []
         left_half: list[list[int]] = []
@@ -125,6 +132,8 @@ class Karnaugh5(KarnaughTemplate):
                 if len(field) not in degrees:
                     field = self.cut_cells_list(field, False)
                 possible_way_to_spread['top'] = False
+        self.calculate_field_perimeter(field)
+        self.expand_field(field, 1)
         return field
 
     def get_variables_after_merge(self) -> list[list[str]]:
@@ -213,6 +222,32 @@ class Karnaugh5(KarnaughTemplate):
                 return indexes
         indexes += other_half_indexes
         return indexes
+
+    def expand_field(self, field: list[tuple], value: int) -> list[tuple]:
+        expanded_field = list(field)
+        for (i, j) in field:
+            if i > 0 and self.map[i - 1][j] == value and (i - 1, j) not in expanded_field:
+                expanded_field.append((i - 1, j))
+            if i < len(self.map) - 1 and self.map[i + 1][j] == value and (i + 1, j) not in expanded_field:
+                expanded_field.append((i + 1, j))
+            if j > 0 and self.map[i][j - 1] == value and (i, j - 1) not in expanded_field:
+                expanded_field.append((i, j - 1))
+            if j < len(self.map[0]) - 1 and self.map[i][j + 1] == value and (i, j + 1) not in expanded_field:
+                expanded_field.append((i, j + 1))
+        return expanded_field
+
+    def calculate_field_perimeter(self, field: list[tuple]) -> int:
+        perimeter = 0
+        for (i, j) in field:
+            if (i - 1, j) not in field:
+                perimeter += 1
+            if (i + 1, j) not in field:
+                perimeter += 1
+            if (i, j - 1) not in field:
+                perimeter += 1
+            if (i, j + 1) not in field:
+                perimeter += 1
+        return perimeter
 
     def print_table(self):
         line_to_print = '     ' + self.variables[2]

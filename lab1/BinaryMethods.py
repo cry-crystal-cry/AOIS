@@ -396,6 +396,20 @@ class BinaryMethods:
         return result
 
     @staticmethod
+    def binary_subtraction(binary_number1: str, binary_number2: str) -> str:
+        # Преобразуем второе число в отрицательное дополнение до двух
+        inverted_binary2 = ''.join('1' if bit == '0' else '0' for bit in binary_number2)
+        negative_binary2 = BinaryMethods.add_1(inverted_binary2)
+
+        result = BinaryMethods.binary_sum(list(binary_number1), list(negative_binary2))
+        # Проверяем знак результата и возвращаем его
+        if result[0] == '1':
+            negative_result = ''.join('1' if bit == '0' else '0' for bit in result)
+            final_result = BinaryMethods.add_1(negative_result)
+            return "-" + final_result.lstrip('0')
+        return result.lstrip('0').zfill(BinaryMethods.TOTAL_BITS)
+
+    @staticmethod
     def binary_float_addition2(first_float: float, second_float: float) -> float:
         first_number = BinaryMethods.decimal_to_float(first_float)
         second_number = BinaryMethods.decimal_to_float(second_float)

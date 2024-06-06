@@ -20,28 +20,28 @@ class TestKarnaughMethod(unittest.TestCase):
         self.assertEqual(merged_form, '((!a)|b)')
 
     def test_Karnaugh3_SDNF(self):
-        self.exp = BooleanExpression('(a&(b>c))')
+        self.exp = BooleanExpression('(a>(b&c))')
         karnaugh_method = Karnaugh3(self.exp, 'SDNF')
         merged_form = karnaugh_method.merged_form()
-        self.assertEqual(merged_form, '((a&(!b))|(a&c))')
+        self.assertEqual(merged_form, '((!a)|(b&c))')
 
     def test_Karnaugh3_SKNF(self):
-        self.exp = BooleanExpression('(a&(b>c))')
+        self.exp = BooleanExpression('(a>(b&c))')
         karnaugh_method = Karnaugh3(self.exp, 'SKNF')
         merged_form = karnaugh_method.merged_form()
-        self.assertEqual(merged_form, '(a&((!b)|c))')
+        self.assertEqual(merged_form, '(((!a)|b)&((!a)|c))')
 
     def test_Karnaugh4_SDNF(self):
-        self.exp = BooleanExpression('((a&b)|(c~d))')
+        self.exp = BooleanExpression('(a>(b&(c|d)))')
         karnaugh_method = Karnaugh4(self.exp, 'SDNF')
         merged_form = karnaugh_method.merged_form()
-        self.assertEqual(merged_form, '(((!c)&(!d))|(c&d)|(a&b))')
+        self.assertEqual(merged_form, '((!a)|(b&d)|(b&c))')
 
     def test_Karnaugh4_SKNF(self):
-        self.exp = BooleanExpression('((a&b)|(c~d))')
+        self.exp = BooleanExpression('(a>(b&(c|d)))')
         karnaugh_method = Karnaugh4(self.exp, 'SKNF')
         merged_form = karnaugh_method.merged_form()
-        self.assertEqual(merged_form, '((a|c|(!d))&(a|(!c)|d)&(b|c|(!d))&(b|(!c)|d))')
+        self.assertEqual(merged_form, '(((!a)|c|d)&((!a)|b))')
 
     def test_Karnaugh5_SDNF(self):
         self.exp = BooleanExpression('((a>b)&(c~(d|e)))')

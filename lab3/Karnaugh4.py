@@ -32,6 +32,13 @@ class Karnaugh4(KarnaughTemplate):
                 counter += 1
         return table
 
+    def check_field_validity(self, field: list[tuple]) -> bool:
+        # check if all cells has same value
+        if not field:
+            return False
+        first_value = self.map[field[0][0]][field[0][1]]
+        return all(self.map[i][j] == first_value for i, j in field)
+
     def get_variables_after_merge(self) -> list[list[str]]:
         fields: list[list[tuple]] = self.form_final_normal_form_fields()
         value = '1' if self.form_to_minimize == 'SDNF' else '0'
@@ -57,6 +64,32 @@ class Karnaugh4(KarnaughTemplate):
             variables.append(final_variables_from_field)
         return variables
 
+    def calculate_field_perimeter(self, field: list[tuple]) -> int:
+        perimeter = 0
+        for (i, j) in field:
+            if (i - 1, j) not in field:
+                perimeter += 1
+            if (i + 1, j) not in field:
+                perimeter += 1
+            if (i, j - 1) not in field:
+                perimeter += 1
+            if (i, j + 1) not in field:
+                perimeter += 1
+        return perimeter
+
+    def expand_field(self, field: list[tuple], value: int) -> list[tuple]:
+        expanded_field = list(field)
+        for (i, j) in field:
+            if i > 0 and self.map[i - 1][j] == value and (i - 1, j) not in expanded_field:
+                expanded_field.append((i - 1, j))
+            if i < len(self.map) - 1 and self.map[i + 1][j] == value and (i + 1, j) not in expanded_field:
+                expanded_field.append((i + 1, j))
+            if j > 0 and self.map[i][j - 1] == value and (i, j - 1) not in expanded_field:
+                expanded_field.append((i, j - 1))
+            if j < len(self.map[0]) - 1 and self.map[i][j + 1] == value and (i, j + 1) not in expanded_field:
+                expanded_field.append((i, j + 1))
+        return expanded_field
+
     def print_table(self):
         line_to_print = '     ' + self.variables[2]
         for i in self.header_line[0]:
@@ -77,14 +110,4 @@ class Karnaugh4(KarnaughTemplate):
                 line_to_print += ' | ' + str(self.map[i][j])
             print(line_to_print)
 
-# Debug or hand usage mode
-#
-# expression = BooleanExpression('(a~((!b)&(c>(a&d))))')
-#
-# karnaugh_method_SDNF = Karnaugh4(expression, 'SDNF')
-# karnaugh_method_SDNF.print_table()
-# print(karnaugh_method_SDNF.merged_form() + '\n')
-#
-# karnaugh_method_SKNF = Karnaugh4(expression, 'SKNF')
-# karnaugh_method_SKNF.print_table()
-# print(karnaugh_method_SKNF.merged_form())
+
