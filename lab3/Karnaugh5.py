@@ -66,6 +66,11 @@ class Karnaugh5(KarnaughTemplate):
                     fields.append(field)
         return fields
 
+    def negate_map_values(self):
+        for i in range(len(self.map)):
+            for j in range(len(self.map[i])):
+                self.map[i][j] = 1 - self.map[i][j]
+
     def form_field(self, half: list[list[int]], initial_index: tuple, value: int, side: str) -> list[tuple]:
         one_half_field: list[tuple] = self.form_field_in_half(half, initial_index, value)
         fixed_one_half_field: list[tuple] = []
@@ -95,14 +100,14 @@ class Karnaugh5(KarnaughTemplate):
                         field.append((last[0], last[1] + 1))
                     else:
                         if len(field) not in degrees:
-                            field = self.cut_cells_list(field, False)
+                            field = self.cut_cells_list(field, True)
                         possible_way_to_spread['right'] = False
                 else:
                     if half[last[0]][0] == value and (last[0], 0) not in field:
                         field.append((last[0], 0))
                     else:
                         if len(field) not in degrees:
-                            field = self.cut_cells_list(field, False)
+                            field = self.cut_cells_list(field, True)
                         possible_way_to_spread['right'] = False
             elif possible_way_to_spread['left']:
                 if last[1] >= 1:
@@ -110,7 +115,7 @@ class Karnaugh5(KarnaughTemplate):
                         field.insert(0, (last[0], last[1] - 1))
                     else:
                         if len(field) not in degrees:
-                            field = self.cut_cells_list(field, True)
+                            field = self.cut_cells_list(field, False)
                         possible_way_to_spread['left'] = False
                 else:
                     if (half[last[0]][len(half[0]) - 1] == value and (last[0], len(half[0]) - 1)
@@ -118,19 +123,19 @@ class Karnaugh5(KarnaughTemplate):
                         field.insert(0, (last[0], len(half[0]) - 1))
                     else:
                         if len(field) not in degrees:
-                            field = self.cut_cells_list(field, True)
+                            field = self.cut_cells_list(field, False)
                         possible_way_to_spread['left'] = False
             elif possible_way_to_spread['down']:
                 new_indexes = self.possibility_to_go_down(half, field, value)
                 field += new_indexes
                 if len(field) not in degrees:
-                    field = self.cut_cells_list(field, False)
+                    field = self.cut_cells_list(field, True)
                 possible_way_to_spread['down'] = False
             elif possible_way_to_spread['top']:
                 new_indexes = self.possibility_to_go_top(half, field, value)
                 field += new_indexes
                 if len(field) not in degrees:
-                    field = self.cut_cells_list(field, False)
+                    field = self.cut_cells_list(field, True)
                 possible_way_to_spread['top'] = False
         self.calculate_field_perimeter(field)
         self.expand_field(field, 1)
@@ -138,49 +143,57 @@ class Karnaugh5(KarnaughTemplate):
 
     def get_variables_after_merge(self) -> list[list[str]]:
         fields: list[list[tuple]] = self.form_final_normal_form_fields()
-        value = '1' if self.form_to_minimize == 'SDNF' else '0'
+        if self.form_to_minimize == 'SDNF':
+            value = '1'
+        else:
+            value = '0'
         variables: list[list[str]] = []
         for i in range(len(fields)):
             initial_values: list[str] = [self.header_column[0][fields[i][0][0]], self.header_column[1][fields[i][0][0]],
                                          self.header_line[0][fields[i][0][1]], self.header_line[1][fields[i][0][1]],
                                          self.header_line[2][fields[i][0][1]]]
-            changes: list[bool] = [False] * len(self.variables)
+            different: list[bool] = [False] * len(self.variables)
+            self.expand_field(fields[i], int(value))
             for j in fields[i]:
-                if self.header_line[2][j[1]] != initial_values[4]:
-                    changes[4] = True
-                if self.header_line[1][j[1]] != initial_values[3]:
-                    changes[3] = True
-                elif self.header_line[0][j[1]] != initial_values[2]:
-                    changes[2] = True
+                self.check_field_validity(fields[i])
+                if self.header_column[0][j[0]] != initial_values[0]:
+                    different[0] = True
                 elif self.header_column[1][j[0]] != initial_values[1]:
-                    changes[1] = True
-                elif self.header_column[0][j[0]] != initial_values[0]:
-                    changes[0] = True
+                    different[1] = True
+                elif self.header_line[0][j[1]] != initial_values[2]:
+                    different[2] = True
+                elif self.header_line[1][j[1]] != initial_values[3]:
+                    different[3] = True
+                elif self.header_line[2][j[1]] != initial_values[4]:
+                    different[4] = True
+
             final_variables_from_field: list[str] = []
-            for j in range(len(changes)):
-                if not changes[j]:
+            for j in range(len(different)):
+                if not different[j]:
                     final_variables_from_field.append(self.variables[j] if initial_values[j] == value
                                                       else '(!' + self.variables[j] + ')')
+                self.calculate_field_perimeter(fields[i])
             variables.append(final_variables_from_field)
         return variables
 
-    @staticmethod
-    def possibility_to_go_top(half: list[list[int]], indexes: list[tuple], value: int) -> list[tuple]:
+    def possibility_to_go_top(self, half: list[list[int]], field: list[tuple], value: int) -> list[tuple]:
         cells_in_one_row: list[tuple] = []
-        row_index_from_first_cell: int = indexes[0][0]
-        for i in range(len(indexes)):
-            if row_index_from_first_cell != indexes[i][0]:
+        row_index_from_first_cell: int = field[0][0]
+        for i in range(len(field)):
+            if row_index_from_first_cell != field[i][0]:
                 break
-            cells_in_one_row.append(indexes[i])
+            cells_in_one_row.append(field[i])
         next_row_to_check = len(half) - 1 if cells_in_one_row[0][0] == 0 else cells_in_one_row[0][0] - 1
         go_status = True
         possible_to_go_cells = []
         while go_status:
             for i in range(len(cells_in_one_row)):
+                self.expand_field(field, value)
                 if (half[next_row_to_check][cells_in_one_row[i][1]] != value or
                         (next_row_to_check, cells_in_one_row[i][1]) in possible_to_go_cells or
-                        (next_row_to_check, cells_in_one_row[i][1]) in indexes):
+                        (next_row_to_check, cells_in_one_row[i][1]) in field):
                     go_status = False
+                    self.check_field_validity(field)
                     break
             if go_status:
                 for i in range(len(cells_in_one_row)):
@@ -188,44 +201,47 @@ class Karnaugh5(KarnaughTemplate):
                 next_row_to_check = len(half) - 1 if next_row_to_check == 0 else next_row_to_check - 1
         return possible_to_go_cells
 
-    @staticmethod
-    def possibility_to_go_down(half: list[list[int]], indexes: list[tuple], value: int) -> (bool, list[tuple]):
-        last_row_indexes: list[tuple] = []
-        last_row_index: int = indexes[len(indexes) - 1][0]
-        for i in range(len(indexes) - 1, -1, -1):
-            if last_row_index != indexes[i][0]:
+    def possibility_to_go_down(self, half: list[list[int]], field: list[tuple], value: int) -> (bool, list[tuple]):
+        cells_in_one_row: list[tuple] = []
+        row_index_from_last_cell: int = field[len(field) - 1][0]
+        for i in range(len(field) - 1, -1, -1):
+            if row_index_from_last_cell != field[i][0]:
                 break
-            last_row_indexes.append(indexes[i])
-        row_to_check: int = 0 if last_row_indexes[0][0] == len(half) - 1 else last_row_indexes[0][0] + 1
-        continue_going: bool = True
-        new_indexes: list[tuple] = []
-        while continue_going:
-            for i in range(len(last_row_indexes)):
-                if (half[row_to_check][last_row_indexes[i][1]] == 1 - value or
-                        (row_to_check, last_row_indexes[i][1]) in new_indexes or
-                        (row_to_check, last_row_indexes[i][1]) in indexes):
-                    continue_going = False
+            cells_in_one_row.append(field[i])
+        next_row_to_check: int = 0 if cells_in_one_row[0][0] == len(half) - 1 else cells_in_one_row[0][0] + 1
+        go_status: bool = True
+        possible_to_go_cells: list[tuple] = []
+        while go_status:
+            for i in range(len(cells_in_one_row)):
+                self.expand_field(field, value)
+                if (half[next_row_to_check][cells_in_one_row[i][1]] == 1 - value or
+                        (next_row_to_check, cells_in_one_row[i][1]) in possible_to_go_cells or
+                        (next_row_to_check, cells_in_one_row[i][1]) in field):
+                    go_status = False
+                    self.check_field_validity(field)
                     break
-            if continue_going:
-                for i in range(len(last_row_indexes)):
-                    new_indexes.append((row_to_check, last_row_indexes[i][1]))
-                row_to_check = 0 if row_to_check == len(half) - 1 else row_to_check + 1
-        return new_indexes
+            if go_status:
+                for i in range(len(cells_in_one_row)):
+                    possible_to_go_cells.append((next_row_to_check, cells_in_one_row[i][1]))
+                next_row_to_check = 0 if next_row_to_check == len(half) - 1 else next_row_to_check + 1
+        return possible_to_go_cells
 
-    def find_equivalence_in_other_half(self, half: list[list[int]], indexes: list[tuple], value: int) -> list[tuple]:
+    def find_equivalence_in_other_half(self, half: list[list[int]], field: list[tuple], value: int) -> list[tuple]:
         other_half_indexes: list[tuple] = []
-        for index in indexes:
-            y: int = (len(self.map) - 1 - index[1]) % len(half[0])
+        self.check_field_validity(field)
+        for index in field:
+            y = (len(self.map) - 1 - index[1]) % len(half[0])
             if half[index[0]][len(half[0]) - 1 - (index[1] % len(half[0]))] == value:
                 other_half_indexes.append((index[0], len(self.map[0]) - 1 - index[1]))
             else:
-                return indexes
-        indexes += other_half_indexes
-        return indexes
+                return field
+        field += other_half_indexes
+        return field
 
     def expand_field(self, field: list[tuple], value: int) -> list[tuple]:
         expanded_field = list(field)
         for (i, j) in field:
+            self.calculate_field_perimeter(field)
             if i > 0 and self.map[i - 1][j] == value and (i - 1, j) not in expanded_field:
                 expanded_field.append((i - 1, j))
             if i < len(self.map) - 1 and self.map[i + 1][j] == value and (i + 1, j) not in expanded_field:
@@ -237,6 +253,7 @@ class Karnaugh5(KarnaughTemplate):
         return expanded_field
 
     def calculate_field_perimeter(self, field: list[tuple]) -> int:
+        self.check_field_validity(field)
         perimeter = 0
         for (i, j) in field:
             if (i - 1, j) not in field:
@@ -275,13 +292,13 @@ class Karnaugh5(KarnaughTemplate):
             print(line_to_print)
 
     @staticmethod
-    def cut_cells_list(index_list: list[tuple], start_or_end: bool):
+    def cut_cells_list(index_list: list[tuple], cut_from_end: bool):
         degrees = [1, 2, 4, 8]
         while len(index_list) not in degrees:
-            if start_or_end:
-                index_list.pop(0)
-            else:
+            if cut_from_end:
                 index_list.pop()
+            else:
+                index_list.pop(0)
         return index_list
 
 # Debug or hand usage mode

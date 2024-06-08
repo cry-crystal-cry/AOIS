@@ -30,25 +30,30 @@ class Karnaugh2(KarnaughTemplate):
 
     def get_variables_after_merge(self) -> list[list[str]]:
         fields: list[list[tuple]] = self.form_final_normal_form_fields()
-        value = '1' if self.form_to_minimize == 'SDNF' else '0'
+        if self.form_to_minimize == 'SDNF':
+            value = '1'
+        else:
+            value = '0'
         variables: list[list[str]] = []
         for i in range(len(fields)):
             initial_values: list[str] = [self.header_column[fields[i][0][0]], self.header_line[fields[i][0][1]]]
-            changes: list[bool] = [False] * len(self.variables)
+            different: list[bool] = [False] * len(self.variables)
+            self.expand_field(fields[i], int(value))
             for cell in fields[i]:
                 if self.header_line[cell[1]] != initial_values[1]:
-                    changes[1] = True
+                    different[1] = True
                 elif self.header_column[cell[0]] != initial_values[0]:
-                    changes[0] = True
+                    different[0] = True
             final_variables_from_field: list[str] = []
-            for j in range(len(changes)):
-                if not changes[j]:
+            for j in range(len(different)):
+                if not different[j]:
                     final_variables_from_field.append(self.variables[j] if initial_values[j] == value
                                                       else '(!' + self.variables[j] + ')')
             variables.append(final_variables_from_field)
         return variables
 
     def calculate_field_perimeter(self, field: list[tuple]) -> int:
+        self.check_field_validity(field)
         perimeter = 0
         for (i, j) in field:
             if (i - 1, j) not in field:
@@ -63,6 +68,7 @@ class Karnaugh2(KarnaughTemplate):
 
     def expand_field(self, field: list[tuple], value: int) -> list[tuple]:
         expanded_field = list(field)
+        self.check_field_validity(expanded_field)
         for (i, j) in field:
             if i > 0 and self.map[i - 1][j] == value and (i - 1, j) not in expanded_field:
                 expanded_field.append((i - 1, j))

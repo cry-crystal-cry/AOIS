@@ -22,14 +22,15 @@ class KarnaughTemplate:
         for i in range(len(self.map)):
             for j in range(len(self.map[0])):
                 if not (i, j) in used_indexes and self.map[i][j] == value:
-                    field = self.form_field((i, j), value)
+                    field = self.form_field(value, (i, j))
                     for index in field:
                         if index not in used_indexes:
                             used_indexes.append(index)
+                    self.calculate_field_perimeter(field)
                     fields.append(field)
         return fields
 
-    def form_field(self, initial_index: tuple, value: int) -> list[tuple]:
+    def form_field(self, value: int, initial_index: tuple) -> list[tuple]:
         ability_to_go: dict = \
             {
                 'right': True,
@@ -69,13 +70,14 @@ class KarnaughTemplate:
                 if not equator_is_formed_flag and len(field) not in degrees:
                     field = self.cut_cells_list(field, degrees)
                 equator_is_formed_flag = True
+                self.calculate_field_perimeter(field)
                 if ability_to_go['down']:
-                    new_indexes = self.possibility_to_go_down(field, value)
+                    new_indexes = self.possibility_to_go_down(value, field)
                     field += new_indexes
                     if len(new_indexes) == 0:
                         ability_to_go['down'] = False
                 elif ability_to_go['up']:
-                    new_indexes = self.possibility_to_go_top(field, value)
+                    new_indexes = self.possibility_to_go_top(value, field)
                     field += new_indexes
                     if len(new_indexes) == 0:
                         ability_to_go['up'] = False
@@ -89,7 +91,16 @@ class KarnaughTemplate:
     def print_table(self):
         pass
 
-    def possibility_to_go_top(self, field: list[tuple], value: int) -> list[tuple]:
+    def calculate_field_perimeter(self, field: list[tuple]) -> int:
+        pass
+
+    def expand_field(self, field: list[tuple], value: int) -> list[tuple]:
+        pass
+
+    def check_field_validity(self, field: list[tuple]) -> bool:
+        pass
+
+    def possibility_to_go_top(self, value: int, field: list[tuple]) -> list[tuple]:
         cells_in_one_row: list[tuple] = []
         row_index_from_first_cell: int = field[0][0]
         for i in range(len(field)):
@@ -97,16 +108,17 @@ class KarnaughTemplate:
                 break
             cells_in_one_row.append(field[i])
         next_row_to_check = len(self.map) - 1 if cells_in_one_row[0][0] == 0 else cells_in_one_row[0][0] - 1
-        self.calculate_field_perimeter(field)
         self.expand_field(field, 1)
         go_status = True
         possible_to_go_cells = []
         while go_status:
             for i in range(len(cells_in_one_row)):
+                self.expand_field(field, int(value))
                 if ((self.map[next_row_to_check][cells_in_one_row[i][1]] != value) or
                         (next_row_to_check, cells_in_one_row[i][1]) in possible_to_go_cells or
                         ((next_row_to_check, cells_in_one_row[i][1]) in field)):
                     go_status = False
+                    self.check_field_validity(field)
                     break
             if go_status:
                 for i in range(len(cells_in_one_row)):
@@ -114,7 +126,7 @@ class KarnaughTemplate:
                 next_row_to_check = len(self.map) - 1 if next_row_to_check == 0 else next_row_to_check - 1
         return possible_to_go_cells
 
-    def possibility_to_go_down(self, field: list[tuple], value: int) -> list[tuple]:
+    def possibility_to_go_down(self, value: int, field: list[tuple]) -> list[tuple]:
         cells_in_one_row: list[tuple] = []
         row_index_from_last_cell: int = field[0][0]
         for i in range(len(field)):
@@ -123,13 +135,16 @@ class KarnaughTemplate:
             cells_in_one_row.append(field[i])
         next_row_to_check = 0 if cells_in_one_row[0][0] == len(self.map) - 1 else cells_in_one_row[0][0] + 1
         go_status = True
+        self.expand_field(field, 1)
         possible_to_go_cells = []
         while go_status:
             for i in range(len(cells_in_one_row)):
+                self.expand_field(field, int(value))
                 if (self.map[next_row_to_check][cells_in_one_row[i][1]] != value or
                         (next_row_to_check, cells_in_one_row[i][1]) in possible_to_go_cells or
                         (next_row_to_check, cells_in_one_row[i][1]) in field):
                     go_status = False
+                    self.check_field_validity(field)
                     break
             if go_status:
                 for i in range(len(cells_in_one_row)):

@@ -60,6 +60,7 @@ class CalculationMethod:
             variables, values, loop_exit = self.uniting(variables, values)
         new_values = values.copy()
         new_variables = variables.copy()
+        self.__get_variable_frequency()
         for i in range(len(new_values)):
             # mark by -1 value of variable to unite
             minuses_amount = 0
@@ -78,9 +79,9 @@ class CalculationMethod:
         marked_as_used = [False] * len(expressions_variables)
         for i in range(len(expressions_variables) - 1):
             for j in range(i + 1, len(expressions_variables)):
-                ready_status, dif_val_pos, dif_var_pos = self.check_ready_for_unite(expressions_values[i],
-                                                                                    expressions_values[j],
-                                                                                    len(expressions_variables[i]) - 1)
+                ready_status, dif_val_pos, dif_var_pos = self.check_ready_for_unite(len(expressions_variables[i]) - 1,
+                                                                                    expressions_values[i],
+                                                                                    expressions_values[j],)
                 if ready_status:
                     i_parent_indexes = self.__parent_indexes[expressions_variables[i].__str__()][:]
                     j_parent_indexes = self.__parent_indexes[expressions_variables[j].__str__()]
@@ -92,10 +93,11 @@ class CalculationMethod:
                     marked_as_used[j] = True
                     temp_uniting_variables, temp_uniting_values = self.uniting_lists(expressions_variables[i],
                                                                                      expressions_values[i],
-                                                                                     dif_val_pos,
-                                                                                     dif_var_pos)
+                                                                                     dif_var_pos,
+                                                                                     dif_val_pos)
                     united_expression_variables.append(temp_uniting_variables)
                     united_expression_values.append(temp_uniting_values)
+                    self.__extract_unique_variables()
                     self.__parent_indexes[temp_uniting_variables.__str__()] = i_parent_indexes
         not_marked_as_used = 0
         for i in range(len(marked_as_used)):
@@ -108,7 +110,7 @@ class CalculationMethod:
         return united_expression_variables, united_expression_values, loop_exit
 
     @staticmethod
-    def check_ready_for_unite(first_exp_values: list[int], sec_exp_values: list[int], asked_amount_of_variables: int):
+    def check_ready_for_unite(asked_amount_of_variables: int, first_exp_values: list[int], sec_exp_values: list[int]):
         if CalculationMethod.indexes_with_minus_value(first_exp_values) != \
                 CalculationMethod.indexes_with_minus_value(sec_exp_values):
             return False, 0, 0
@@ -139,8 +141,8 @@ class CalculationMethod:
         return indexes
 
     @staticmethod
-    def uniting_lists(expressions_variables: list[str], expression_values: list[int], dif_value_pos: int,
-                      dif_var_pos: int) -> (list[str], list[bool]):
+    def uniting_lists(expressions_variables: list[str], expression_values: list[int], dif_var_pos: int,
+                      dif_value_pos: int) -> (list[str], list[bool]):
         uniting_variables = []
         uniting_values = expression_values[:]
         for i in range(len(expressions_variables)):
@@ -194,6 +196,29 @@ class CalculationMethod:
             result = result[1:len(result) - 1]
         return result
 
+    def __get_variable_frequency(self) -> dict:
+        variable_frequency = {}
+        for variable_list in self.__sub_expressions_variables:
+            for variable in variable_list:
+                variable_frequency[variable] = variable_frequency.get(variable, 0) + 1
+        return variable_frequency
+
+    def __extract_unique_variables(self) -> set:
+        unique_variables = set()
+        for variable_list in self.__sub_expressions_variables:
+            for variable in variable_list:
+                unique_variables.add(variable)
+        return unique_variables
+
+    def __validate_expression_syntax(self):
+        if not isinstance(self.__exp, str):
+            raise TypeError("Expression must be a string")
+        if not self.__exp:
+            raise ValueError("Expression cannot be empty")
+        allowed_chars = set('abcdefghijklmnopqrstuvwxyz!|&()~>')
+        if not all(char in allowed_chars for char in self.__exp):
+            raise ValueError("Expression contains invalid characters")
+
     @property
     def form_to_minimize(self):
         return self.__form_to_minimize
@@ -220,20 +245,19 @@ class CalculationMethod:
 
 
 # Debug or hand usage mode
-
-expression = BooleanExpression('(a>(b>c))')
-
-SDNF = expression.build_SDNF()
-print('SDNF\n' + SDNF)
-
-calculation_method = CalculationMethod(SDNF, 'SDNF')
-merged_by_SDNF = calculation_method.merged_form()
-# for (a&(b>(c|f))) correct answer -> a !b v a f v a c
-print('merged by SDNF expression\n' + merged_by_SDNF)
-
-SKNF = expression.build_SKNF()
-print('SKNF\n' + SKNF)
-
-calculation_method = CalculationMethod(SKNF, 'SKNF')
-merged_by_SKNF = calculation_method.merged_form()
-print('merged by SKNF expression\n' + merged_by_SKNF)
+#
+# expression = BooleanExpression('((!a)|(d~c))')
+#
+# SDNF = expression.build_SDNF()
+# print('SDNF\n' + SDNF)
+#
+# calculation_method = CalculationMethod(SDNF, 'SDNF')
+# merged_by_SDNF = calculation_method.merged_form()
+# print('merged by SDNF expression\n' + merged_by_SDNF)
+#
+# SKNF = expression.build_SKNF()
+# print('SKNF\n' + SKNF)
+#
+# calculation_method = CalculationMethod(SKNF, 'SKNF')
+# merged_by_SKNF = calculation_method.merged_form()
+# print('merged by SKNF expression\n' + merged_by_SKNF)
