@@ -31,6 +31,24 @@ class BinaryMethods:
         return added_1_number
 
     @staticmethod
+    def is_valid_binary(binary_number: str):
+        for bit in binary_number:
+            if bit not in '01':
+                raise ValueError("Not in 1 or 0")
+
+    @staticmethod
+    def remove_leading_zeros(binary_number: str) -> str:
+        BinaryMethods.is_valid_binary(binary_number)
+        non_zero_found = False
+        trimmed_binary = ''
+        for bit in binary_number:
+            if not non_zero_found and bit == '0':
+                continue
+            non_zero_found = True
+            trimmed_binary += bit
+        return trimmed_binary if non_zero_found else '0'
+
+    @staticmethod
     def get_negative_binary(decimal_number: str) -> str:
         inverted_number = ''.join(['1' if bit == '0' else '0' for bit in decimal_number])
         # Add 1 to the inverted bits to get the two's complement
@@ -53,6 +71,7 @@ class BinaryMethods:
 
     @staticmethod
     def binary_to_decimal(binary_number) -> int:
+        BinaryMethods.is_valid_binary(binary_number)
         length_of_number = len(binary_number)
         result = 0
         for i in range(length_of_number):
@@ -122,12 +141,12 @@ class BinaryMethods:
             return -multiplied_result
 
     @staticmethod
-    def is_less(bin1: str, bin2: str) -> bool:
-        bin1 = bin1.lstrip('0')
-        bin2 = bin2.lstrip('0')
-        if len(bin1) != len(bin2):
-            return len(bin1) < len(bin2)
-        return bin1 < bin2
+    def is_less(first_binary: str, second_binary: str) -> bool:
+        first_binary = BinaryMethods.remove_leading_zeros(first_binary)
+        second_binary = BinaryMethods.remove_leading_zeros(second_binary)
+        if len(first_binary) != len(second_binary):
+            return len(first_binary) < len(second_binary)
+        return first_binary < second_binary
 
     @classmethod
     def divide_bin(cls, first: str, second: str):
@@ -188,7 +207,7 @@ class BinaryMethods:
     @classmethod
     def find_shift_order(cls, binary_int: str, binary_fractional: str) -> str:
         if binary_int != '0':
-            exponent = len(binary_int.lstrip()) - 1
+            exponent = len(BinaryMethods.remove_leading_zeros(binary_int)) - 1
         else:
             fractional = binary_fractional
             exponent = 0
@@ -285,6 +304,7 @@ class BinaryMethods:
             decimal_diff = BinaryMethods.binary_to_decimal(diff)
             second_mantissa = '0' * decimal_diff + second_mantissa[:-decimal_diff]
             exponent_for_two = first_exponent
+            BinaryMethods.binary_subtraction(first_number, second_number)
         elif first_exponent < second_exponent:
             diff = BinaryMethods.binary_sum(list(str(BinaryMethods.decimal_to_binary(second_exponent))),
                                             list(BinaryMethods.get_negative_binary(
@@ -292,22 +312,23 @@ class BinaryMethods:
             decimal_diff = BinaryMethods.binary_to_decimal(diff)
             first_mantissa = '0' * decimal_diff + first_mantissa[:-decimal_diff]
             exponent_for_two = second_exponent
+            BinaryMethods.binary_subtraction(first_number, second_number)
         else:
             exponent_for_two = first_exponent
         return first_mantissa, second_mantissa, exponent_for_two
 
     @classmethod
-    def check_which_mantissa_is_less(cls, first_number: str, second_number: str):
+    def check_first_mantissa_is_less(cls, first_number: str, second_number: str):
         first_mantissa = '1' + first_number[9:]
         second_mantissa = '1' + second_number[9:]
-        first_mantissa = first_mantissa.lstrip('0')
-        second_mantissa = second_mantissa.lstrip('0')
+        first_mantissa = BinaryMethods.remove_leading_zeros(first_mantissa)
+        second_mantissa = BinaryMethods.remove_leading_zeros(second_mantissa)
         if len(first_mantissa) != len(second_mantissa):
             return len(first_mantissa) < len(second_mantissa)
         return first_mantissa < second_mantissa
 
     @classmethod
-    def check_which_exponent_is_less(cls, first_number: str, second_number: str):
+    def check_first_exponent_is_less(cls, first_number: str, second_number: str):
         first_sign, second_sign, first_exponent, second_exponent = \
             BinaryMethods.search_of_initial_arguments(first_number, second_number)
         if first_sign == second_sign:
@@ -390,6 +411,7 @@ class BinaryMethods:
         shift_result = BinaryMethods.binary_sum(list(BinaryMethods.decimal_to_binary(exponent_for_two)),
                                                 list('01111111'))  # итоговое значение сдвига
 
+        BinaryMethods.binary_subtraction(first_number, second_number)
         result_mantissa = mantissa_sum[1:]
 
         result = result_sign + shift_result[-8:] + result_mantissa
@@ -402,12 +424,14 @@ class BinaryMethods:
         negative_binary2 = BinaryMethods.add_1(inverted_binary2)
 
         result = BinaryMethods.binary_sum(list(binary_number1), list(negative_binary2))
+        BinaryMethods.check_first_mantissa_is_less(binary_number1, binary_number2)
+        BinaryMethods.check_first_exponent_is_less(binary_number1, binary_number2)
         # Проверяем знак результата и возвращаем его
         if result[0] == '1':
             negative_result = ''.join('1' if bit == '0' else '0' for bit in result)
             final_result = BinaryMethods.add_1(negative_result)
-            return "-" + final_result.lstrip('0')
-        return result.lstrip('0').zfill(BinaryMethods.TOTAL_BITS)
+            return "-" + BinaryMethods.remove_leading_zeros(final_result)
+        return BinaryMethods.remove_leading_zeros(result).zfill(BinaryMethods.TOTAL_BITS)
 
     @staticmethod
     def binary_float_addition2(first_float: float, second_float: float) -> float:

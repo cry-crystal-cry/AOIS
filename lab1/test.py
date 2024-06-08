@@ -74,7 +74,7 @@ class TestBinaryMethods(unittest.TestCase):
     def test_diff_between_shifts_and_mantissa_additions(self):
         mantissa1, mantissa2, exp_result = BinaryMethods.diff_between_shifts_and_mantissa_additions(
             '00111111101000000000000000000000', '10111111101000000000000000000000', -127, -127)
-        BinaryMethods.check_which_mantissa_is_less('00111111101000000000000000000000',
+        BinaryMethods.check_first_mantissa_is_less('00111111101000000000000000000000',
                                                    '10111111101000000000000000000000')
         self.assertEqual((mantissa1, mantissa2, exp_result),
                          ('101000000000000000000000', '101000000000000000000000', -127))
@@ -82,7 +82,7 @@ class TestBinaryMethods(unittest.TestCase):
     def test_mantissa_addition(self):
         mantissa_sum, exp_result = BinaryMethods.mantissa_addition('0', '1', '01000000000000000000000',
                                                                    '01000000000000000000000', -127)
-        BinaryMethods.check_which_exponent_is_less('00111111101000000000000000000000',
+        BinaryMethods.check_first_exponent_is_less('00111111101000000000000000000000',
                                                    '10111111101000000000000000000000')
         self.assertEqual((mantissa_sum, exp_result), ('00000000000000000000000000000000', 0))
 
